@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritasAI 4.0 Pro - Detector Forense de Inteligencia Artificial</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        * { transition: background-color 0.15s ease, border-color 0.15s ease; }
+        .gauge-cover {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .highlight-ai {
+            background-color: rgba(254, 226, 226, 0.85);
+            border-bottom: 2px solid #ef4444;
+        }
+        .dark .highlight-ai {
+            background-color: rgba(127, 29, 29, 0.55);
+            border-bottom: 2px solid #f87171;
+            color: #fca5a5;
+        }
+        .highlight-hybrid {
+            background-color: rgba(254, 243, 199, 0.85);
+            border-bottom: 2px solid #f59e0b;
+        }
+        .dark .highlight-hybrid {
+            background-color: rgba(120, 53, 15, 0.55);
+            border-bottom: 2px solid #fbbf24;
+            color: #fde68a;
+        }
+        .highlight-human {
+            background-color: rgba(209, 250, 229, 0.7);
+            border-bottom: 2px solid #10b981;
+        }
+        .dark .highlight-human {
+            background-color: rgba(6, 78, 59, 0.55);
+            border-bottom: 2px solid #34d399;
+            color: #a7f3d0;
+        }
+        .highlight-excluded {
+            background-color: rgba(241, 245, 249, 0.9);
+            border-bottom: 1px dashed #94a3b8;
+            opacity: 0.7;
+        }
+        .dark .highlight-excluded {
+            background-color: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px dashed #64748b;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">VeritasAI</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">v4.1 Calibrado</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Motor Forense Estilométrico Recalibrado • Alta Calibración Anti-Falsos Negativos</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden lg:flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-medium border border-slate-200 dark:border-slate-700">
+                    <button id="modeLocalBtn" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        Análisis Lingüístico Recalibrado
+                    </button>
+                    <button id="modeHybridBtn" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        + Gemini 3 Flash LLM Judge
+                    </button>
+                </div>
+
+                <button id="themeToggleBtn" type="button" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700" title="Cambiar Tema">
+                    <svg id="sunIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg id="moonIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        <div class="text-center max-w-3xl mx-auto mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Análisis Forense de Detección de Texto IA
+            </h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+                Evaluación multidimensional calibrada de perplejidad, simetría oracional, ráfaga sintáctica y marcadores discursivos característicos de LLMs.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <section class="lg:col-span-7 flex flex-col gap-4">
+                <div id="dropZone" class="bg-white dark:bg-slate-800 rounded-2xl p-5 border-2 border-dashed border-slate-200 dark:border-slate-700/80 shadow-sm relative transition-all">
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <label for="textInput" class="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Texto Objetivo para Análisis
+                        </label>
+                        
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <input type="file" id="fileUploadInput" accept=".txt,.md,.doc,.docx" class="hidden" />
+                            <button id="uploadFileBtn" class="text-[11px] px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-medium transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                Cargar Archivo
+                            </button>
+                            <button id="presetAiBtn" class="text-[11px] px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-300 font-medium transition-colors" title="Texto 100% IA típico">
+                                Demo ChatGPT / IA
+                            </button>
+                            <button id="presetAcademicHumanBtn" class="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-medium transition-colors" title="Paper académico humano orgánico">
+                                Paper Humano
+                            </button>
+                            <button id="presetEditedBtn" class="text-[11px] px-2.5 py-1 rounded-lg bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 font-medium transition-colors">
+                                IA Editado / Híbrido
+                            </button>
+                            <button id="clearBtn" class="text-[11px] px-2 py-1 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea 
+                        id="textInput" 
+                        rows="11" 
+                        class="w-full p-4 text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-y text-sm leading-relaxed transition-all placeholder:text-slate-400 font-sans"
+                        placeholder="Pega el texto que deseas analizar. El sistema detectará automáticamente patrones sintácticos, rigidez oracional, repetición de estructuras y muletillas típicas de modelos de inteligencia artificial..."
+                    ></textarea>
+
+                    <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500 dark:text-slate-400 font-medium">Estilo de Análisis:</span>
+                            <select id="targetGenreSelect" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-2.5 py-1 border border-slate-200 dark:border-slate-600 outline-none focus:ring-1 focus:ring-blue-500">
+                                <option value="general">General / Ensayo / Artículo (Estándar)</option>
+                                <option value="academic">Académico / Científico Formal</option>
+                                <option value="creative">Narrativo / Creativo Casual</option>
+                            </select>
+                        </div>
+
+                        <button id="toggleAuthorDrawerBtn" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1">
+                            <span>👤 Comparar con Muestra del Autor</span>
+                        </button>
+                    </div>
+
+                    <!-- Drawer Muestra del Autor -->
+                    <div id="authorSampleDrawer" class="hidden mt-3 p-4 bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 rounded-xl text-xs space-y-2 animate-fade-in">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-blue-900 dark:text-blue-200">Perfil Estilométrico del Autor (Opcional)</span>
+                            <span class="text-[10px] text-blue-600 dark:text-blue-400">Compara contra la propia línea base del usuario</span>
+                        </div>
+                        <textarea id="authorSampleInput" rows="3" class="w-full p-2.5 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-lg outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400" placeholder="Pega aquí una muestra verificada de texto escrito previamente por el autor para calcular su norma estilométrica personal..."></textarea>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 mt-2 border-t border-slate-100 dark:border-slate-700/50">
+                        <div class="flex gap-4">
+                            <span>Palabras: <strong id="wordCount" class="text-slate-700 dark:text-slate-200">0</strong></span>
+                            <span>Caracteres: <strong id="charCount" class="text-slate-700 dark:text-slate-200">0</strong></span>
+                            <span>Oraciones: <strong id="rawSentenceCount" class="text-slate-700 dark:text-slate-200">0</strong></span>
+                        </div>
+                        <span id="readTime">Tiempo est. lectura ~ 0 min</span>
+                    </div>
+                </div>
+
+                <button 
+                    id="analyzeBtn" 
+                    disabled 
+                    class="w-full py-4 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:via-indigo-700 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 dark:shadow-none flex items-center justify-center gap-3 text-base transition-all transform active:scale-[0.99]"
+                >
+                    <span id="btnText">Ejecutar Análisis Forense de IA</span>
+                    <svg id="btnSpinner" class="w-5 h-5 animate-spin hidden text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </section>
+
+            <section class="lg:col-span-5">
+                <div id="resultsCard" class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm relative">
+                    
+                    <div id="emptyState" class="py-16 text-center flex flex-col items-center justify-center">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-400 mb-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <h3 class="text-base font-semibold text-slate-700 dark:text-slate-300">Esperando texto para analizar</h3>
+                        <p class="text-xs text-slate-400 max-w-xs mt-1 leading-relaxed">Ingresa un texto o ensayo. El sistema evaluará el perfil estilométrico y detectará patrones de generación automática.</p>
+                    </div>
+
+                    <div id="analysisContent" class="hidden space-y-5 animate-fade-in">
+                        
+                        <!-- Gauge de Probabilidad -->
+                        <div class="flex flex-col items-center text-center pb-4 border-b border-slate-100 dark:border-slate-700/60">
+                            <div class="relative w-44 h-44 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                    <circle class="text-slate-100 dark:text-slate-700" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"/>
+                                    <circle id="gaugeCircle" class="gauge-cover text-blue-600" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"/>
+                                </svg>
+                                <div class="absolute flex flex-col items-center">
+                                    <span id="aiScorePercent" class="text-4xl font-black text-slate-900 dark:text-white">0%</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Probabilidad de IA</span>
+                                </div>
+                            </div>
+
+                            <div id="verdictBadge" class="mt-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide bg-slate-100 text-slate-700">
+                                Evaluando...
+                            </div>
+
+                            <!-- Intervalo de Incertidumbre Explícito -->
+                            <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900/50 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <span>Rango Estimado:</span>
+                                <strong id="uncertaintyRange" class="text-slate-700 dark:text-slate-200 font-mono">0% - 0%</strong>
+                                <span id="confidenceLevelBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-medium">Confianza: Alta</span>
+                            </div>
+                        </div>
+
+                        <!-- Banner de Auditoría de Segmentación -->
+                        <div id="segmentationAuditBanner" class="p-3.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 space-y-1">
+                            <div class="flex items-center gap-2 font-bold text-blue-800 dark:text-blue-300">
+                                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Informe de Segmentación Lingüística</span>
+                            </div>
+                            <p id="auditDetailsText" class="leading-relaxed text-[11px]">Análisis completado en el cuerpo del texto principal.</p>
+                        </div>
+
+                        <!-- DESGLOSE DE SEGMENTACIÓN -->
+                        <div class="bg-slate-50 dark:bg-slate-900/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-700 dark:text-slate-300">Desglose de Bloques Identificados</span>
+                                <span class="text-[10px] text-slate-400">Total Bloques: <strong id="totalBlocksCount" class="text-slate-700 dark:text-slate-200">0</strong></span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Cuerpo Principal</span>
+                                    <strong id="bodySentencesCount" class="text-blue-600 dark:text-blue-400 text-sm font-bold">0 oraciones</strong>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Títulos / Subtítulos</span>
+                                    <strong id="titlesCount" class="text-slate-700 dark:text-slate-300 text-sm font-bold">0</strong>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Referencias / DOIs</span>
+                                    <strong id="referencesCount" class="text-slate-700 dark:text-slate-300 text-sm font-bold">0</strong>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Listas / Viñetas</span>
+                                    <strong id="listsCount" class="text-slate-700 dark:text-slate-300 text-sm font-bold">0</strong>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Tablas / Figuras</span>
+                                    <strong id="tablesCount" class="text-slate-700 dark:text-slate-300 text-sm font-bold">0</strong>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <span class="text-slate-400 block text-[10px]">Abreviaturas Protegidas</span>
+                                    <strong id="abbrevCount" class="text-indigo-600 dark:text-indigo-400 text-sm font-bold">0</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INDICADORES MULTIDIMENSIONALES -->
+                        <div class="space-y-3">
+                            <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Indicadores Multidimensionales</h4>
+
+                            <!-- Ráfaga Sintáctica (CV) -->
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                        Ráfaga Sintáctica (CV Rítmico)
+                                        <span class="cursor-help text-slate-400 hover:text-slate-600" title="CV bajo (<0.40) indica alta rigidez y uniformidad típica de IA. CV alto (>0.60) indica ritmo humano variante.">ⓘ</span>
+                                    </span>
+                                    <span id="burstinessVal" class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">0.00</span>
+                                </div>
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                    <div id="burstinessBar" class="bg-blue-600 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
+                                </div>
+                                <p id="burstinessDesc" class="text-[11px] text-slate-500 mt-1">Variación rítmica de la longitud de las frases.</p>
+                            </div>
+
+                            <!-- Diversidad Léxica (TTR & Entropía) -->
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                        Diversidad y Complejidad Léxica (TTR: <span id="ttrVal" class="font-mono">0.00</span> | Entropía: <span id="entropyVal" class="font-mono">0.0</span>)
+                                    </span>
+                                    <span id="perplexityVal" class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">0/100</span>
+                                </div>
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                    <div id="perplexityBar" class="bg-indigo-600 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
+                                </div>
+                                <p id="perplexityDesc" class="text-[11px] text-slate-500 mt-1">Uniformidad y vocabulario predicho por modelos de lenguaje.</p>
+                            </div>
+
+                            <!-- Marcadores Discursivos / Buzzwords -->
+                            <div class="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Conectores / Muletillas Características de IA</span>
+                                    <span id="buzzwordsVal" class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">0 detectados</span>
+                                </div>
+                                <div id="buzzwordTags" class="flex flex-wrap gap-1 mt-1.5 min-h-[22px]">
+                                    <span class="text-[10px] text-slate-400 italic">Sin muletillas típicas de IA</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-700">
+                            <button id="copyReportBtn" class="text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                Copiar Resumen de Análisis
+                            </button>
+                            <span id="copyToast" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium opacity-0 transition-opacity">¡Copiado!</span>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PERFIL RÍTMICO DE LONGITUDES DE ORACIÓN -->
+        <section id="rhythmicProfileSection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm space-y-6">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            Perfil Rítmico y Distribución de Longitudes
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Estadística descriptiva para evaluar la simetría y variabilidad del texto.</p>
+                    </div>
+                </div>
+
+                <!-- TABLA ESTADÍSTICA DE LONGITUDES -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 text-center">
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Media</span>
+                        <strong id="statMean" class="text-base font-mono font-extrabold text-slate-800 dark:text-slate-100">0.0</strong>
+                        <span class="text-[9px] text-slate-400 block">palabras/oración</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Mediana (p50)</span>
+                        <strong id="statMedian" class="text-base font-mono font-extrabold text-blue-600 dark:text-blue-400">0.0</strong>
+                        <span class="text-[9px] text-slate-400 block">puntos centrales</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Desv. Estándar</span>
+                        <strong id="statStdDev" class="text-base font-mono font-extrabold text-slate-800 dark:text-slate-100">0.0</strong>
+                        <span class="text-[9px] text-slate-400 block">dispersión σ</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Percentil 25 (p25)</span>
+                        <strong id="statP25" class="text-base font-mono font-bold text-slate-700 dark:text-slate-300">0</strong>
+                        <span class="text-[9px] text-slate-400 block">palabras</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Percentil 75 (p75)</span>
+                        <strong id="statP75" class="text-base font-mono font-bold text-slate-700 dark:text-slate-300">0</strong>
+                        <span class="text-[9px] text-slate-400 block">palabras</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Rango IQR</span>
+                        <strong id="statIQR" class="text-base font-mono font-bold text-indigo-600 dark:text-indigo-400">0</strong>
+                        <span class="text-[9px] text-slate-400 block">p75 - p25</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Mín. / Máx.</span>
+                        <strong id="statMinMax" class="text-sm font-mono font-bold text-slate-700 dark:text-slate-300">0 / 0</strong>
+                        <span class="text-[9px] text-slate-400 block">rango oracional</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Atípicos (Outliers)</span>
+                        <strong id="statOutliers" class="text-base font-mono font-bold text-amber-600 dark:text-amber-400">0</strong>
+                        <span class="text-[9px] text-slate-400 block">> 1.5 * IQR</span>
+                    </div>
+                </div>
+
+                <!-- HISTOGRAMA DE CADENCIA SECUENCIAL -->
+                <div>
+                    <div class="flex justify-between items-center mb-2 text-xs">
+                        <span class="font-bold text-slate-700 dark:text-slate-300">Secuencia Cronológica de Longitudes (Oraciones en Orden Original)</span>
+                        <span class="text-slate-400">Pasa el cursor sobre cada barra para inspeccionar la oración</span>
+                    </div>
+                    <div id="histogramContainer" class="w-full h-36 flex items-end gap-1.5 pt-4 pb-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+                        <!-- Renderizado por JS -->
+                    </div>
+                </div>
+
+                <!-- ANÁLISIS DE VARIACIÓN SINTÁCTICA -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+                    <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/60 space-y-1">
+                        <span class="font-bold text-slate-800 dark:text-slate-200 block">Variación Consecutiva ($\Delta$)</span>
+                        <p id="consecutiveDeltaText" class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Calculando diferencia promedio entre oraciones contiguas...
+                        </p>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/60 space-y-1">
+                        <span class="font-bold text-slate-800 dark:text-slate-200 block">Distribución de Tipos</span>
+                        <div id="sentenceTypesDistribution" class="text-slate-600 dark:text-slate-400 space-y-0.5">
+                            <!-- JS inserter -->
+                        </div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/60 space-y-1">
+                        <span class="font-bold text-slate-800 dark:text-slate-200 block">Análisis de Cambios de Estructura</span>
+                        <p id="sectionShiftText" class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Analizando coherencia y variación estructural del cuerpo principal.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- EXPLICABILIDAD Y FACTORES DETECTADOS -->
+        <section id="explainabilitySection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Explicabilidad Forense & Hallazgos
+                    </h3>
+                    <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800">
+                        Diagnóstico Algorítmico
+                    </span>
+                </div>
+
+                <div id="explainabilityList" class="space-y-3 text-xs">
+                    <!-- Dinámico por JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- INSPECTOR DE TEXTO Y CLASIFICACIÓN FRASE POR FRASE -->
+        <section id="zeroGptSentenceSection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Inspector de Frases y Diagnóstico Frase por Frase
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Haz clic en cualquier segmento para ver métricas y detalles individuales.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-200 dark:bg-red-900 border border-red-500"></span> Alta Sospecha IA</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-200 dark:bg-amber-900 border border-amber-500"></span> Híbrido / Asistido</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-200 dark:bg-emerald-900 border border-emerald-500"></span> Humano Orgánico</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 dark:bg-slate-700 border border-slate-400"></span> Paratexto Excluido</span>
+                    </div>
+                </div>
+
+                <div id="zeroGptTextContainer" class="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 text-sm leading-relaxed space-y-2">
+                </div>
+
+                <div id="sentenceDetailCard" class="mt-4 p-3.5 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hidden text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="font-bold text-slate-700 dark:text-slate-200 block text-xs mb-0.5" id="detailSentenceTitle">Bloque #1</span>
+                        <p id="detailSentenceText" class="text-slate-600 dark:text-slate-300 italic">"..."</p>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span id="detailSentenceTypeBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700">Cuerpo Principal</span>
+                        <span id="detailSentenceWords" class="text-slate-500 text-[11px]">0 palabras</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARACIÓN CON MUESTRA DEL AUTOR -->
+        <section id="authorComparisonSection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Comparación Estilométrica Individual vs. Muestra del Autor
+                    </h3>
+                    <span id="authorSimilarityBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200">
+                        Perfil del Autor
+                    </span>
+                </div>
+
+                <div id="authorComparisonDetails" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <!-- JS population -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN LLM JUDGE (GEMINI 3 FLASH) -->
+        <section id="llmJudgeSection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-xl border border-indigo-800/40">
+                <div class="flex items-center justify-between pb-4 mb-4 border-b border-indigo-800/50">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-violet-600/30 border border-violet-400/40 flex items-center justify-center text-violet-300">
+                            ✨
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Dictamen Cualitativo LLM Judge (Gemini 3 Flash)</h3>
+                            <p class="text-xs text-slate-300">Juicio cualitativo complementario para contexto estilístico</p>
+                        </div>
+                    </div>
+                    <span id="llmScoreBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-violet-600/50 text-violet-200 border border-violet-400/30">
+                        Procesando...
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 uppercase tracking-wider mb-1">Evaluación Cualitativa de Perplejidad</h4>
+                            <p id="llmPerplexityText" class="text-slate-300">Analizando el tono discursivo...</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 uppercase tracking-wider mb-1">Análisis de Cadencia y Ráfaga</h4>
+                            <p id="llmBurstinessText" class="text-slate-300">Evaluando el flujo oracional...</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold text-indigo-300 uppercase tracking-wider mb-1">Observaciones Forenses Destacadas</h4>
+                            <ul id="llmObservationsList" class="list-disc list-inside space-y-1 text-slate-300">
+                                <li>Esperando respuesta...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INFORME FINAL ESTILOMÉTRICO -->
+        <section id="fullReportSection" class="mt-8 hidden animate-fade-in">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700/80 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Informe Forense Estilométrico Completo
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Documento de auditoría técnica con métricas y desglose cuantitativo.</p>
+                    </div>
+                    <button id="downloadReportTextBtn" class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold text-xs hover:bg-slate-800 transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        Copiar Informe Completo
+                    </button>
+                </div>
+
+                <div id="fourteenPointsContainer" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-2 whitespace-pre-wrap text-slate-700 dark:text-slate-300">
+                    <!-- JS Populated Text -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-xs text-slate-500 dark:text-slate-400 space-y-2">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <p class="font-semibold text-slate-700 dark:text-slate-300">VeritasAI 4.1 Core Engine • Detección Forense y Análisis Lingüístico</p>
+                <div class="flex gap-4">
+                    <span>Ajuste Rítmico de Ráfaga</span>
+                    <span>•</span>
+                    <span>Análisis Léxico Recalibrado</span>
+                    <span>•</span>
+                    <span>Filtro de Muletillas IA</span>
+                </div>
+            </div>
+            <p class="text-[11px] leading-relaxed">
+                <strong>Nota metodológica:</strong> Las estimaciones de sospecha de IA se calculan a partir de la variabilidad sintáctica, perplejidad léxica y patrones de conectores. Para manuscritos con alto tecnicismo, se recomienda verificar los resultados junto al inspector de frases.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- PRESETS DE PRUEBA ---
+        const PRESETS = {
+            ai: `En el panorama tecnológico actual, la inteligencia artificial se ha consolidado como un pilar fundamental para la transformación digital. Es importante destacar que los modelos de lenguaje no solo optimizan procesos complejos, sino que también desempeñan un papel crucial en la facilitación del acceso a la información. En conclusión, el desarrollo meticuloso de estas herramientas continuará moldeando el futuro de la sociedad moderna, permitiendo alcanzar niveles de eficiencia previamente inimaginables en diversos ámbitos. Por lo tanto, es de suma importancia adoptar un enfoque equilibrado.`,
+
+            academicHuman: `Análisis de la Dinámica Termodinámica en Sistemas Disipativos
+Por: Dr. Carlos M. Mendoza, Dra. A. R. Fuentes
+Universidad Nacional de Colombia, DOI: 10.1016/j.thermo.2024.08.012
+
+1. Introducción
+La caracterización de la entropía en fluidos no ideales ha sido objeto de intenso debate académico (ver p. ej. Smith et al., 2019; Pérez & Gómez, 2021). De acuerdo con las mediciones empíricas realizadas por nuestro equipo en el laboratorio de transferencia de calor, las fluctuaciones de temperatura observadas en el régimen estacionario presentan una desviación estándar no superior al 2.4 % (ver Fig. 3, p. 45). Es necesario enfatizar que la tasa de disipación no sigue un comportamiento lineal cuando la diferencia de potencial térmico excede los 150 K. En tales condiciones, la ecuación diferencial estocástica propuesta por Langevin requiere correcciones de orden superior para capturar adecuadamente los efectos de turbulencia local.
+
+2. Metodología
+Para evaluar el coeficiente de transferencia $h_c$, se empleó una celda de convección cilíndrica. Las propiedades termofísicas se tabularon a $T = 298.15 \text{ K}$.
+
+Tabla 1: Propiedades físicas del fluido a 298.15 K
+-------------------------------------------------
+Muestra | Viscosidad (mPa·s) | Conductividad (W/m·K)
+A-1     | 1.002              | 0.598
+B-2     | 1.450              | 0.612
+
+3. Resultados y Discusión
+Sorprendentemente, al elevar el flujo másico, el sistema mostró una bifurcación no anticipada. ¿A qué se debe este fenómeno? Creemos que la estructura microdispersa del solvente altera el gradiente superficial.
+
+Referencias Bibliográficas:
+[1] Smith, J. K., et al. (2019). Non-linear heat dissipation. Journal of Applied Physics, 45(2), pp. 112-128.
+[2] Pérez, L., & Gómez, R. (2021). Termodinámica de fluidos complejos. Ed. Académica Colombiana.`,
+
+            edited: `Las herramientas de inteligencia artificial han transformado el flujo de trabajo académico. Sin embargo, su uso plantea serios interrogantes éticos en la educación superior. Ayer revisé tres manuscritos universitarios. Aunque el lenguaje resultaba fluido y pulcro, la argumentación carecía de profundidad crítica. Por consiguiente, los profesores deben implementar evaluaciones presenciales de razonamiento lógico.`
+        };
+
+        // PATRONES Y REGEX DE MULETILLAS CLICHÉ DE IA (RECALIBRADO)
+        const AI_BUZZWORD_PATTERNS = [
+            /en el panorama/i, /pilar fundamental/i, /transformación digital/i,
+            /es importante (destacar|mencionar|recalcar|señalar)/i, /desempeña n? un (papel|rol) (crucial|fundamental|clave)/i,
+            /un (papel|rol) (crucial|fundamental|clave)/i, /en conclusión/i, /por lo tanto/i,
+            /meticuloso/i, /previamente inimaginable/i, /en diversos ámbitos/i,
+            /es de suma importancia/i, /cabe (destacar|mencionar|señalar|recalcar)/i,
+            /en este sentido/i, /por consiguiente/i, /vale la pena (mencionar|destacar)/i,
+            /en última instancia/i, /moldeando el futuro/i, /optimizan procesos/i,
+            /en resumen/i, /asimismo/i, /delve/i, /tapestry/i, /testament/i, /pivotal role/i,
+            /fostering/i, /in conclusion/i, /furthermore/i, /underscores/i, /meticulously/i, /ever-evolving/i
+        ];
+
+        const PROTECTED_ABBREVIATIONS = [
+            'et al.', 'p.', 'pp.', 'ed.', 'eds.', 'e.g.', 'i.e.', 'etc.', 'fig.', 'figs.',
+            'vol.', 'vols.', 'dr.', 'dra.', 'prof.', 'vs.', 'no.', 'p.ej.', 'op. cit.', 'ibid.'
+        ];
+
+        // --- REFERENCIAS DOM ---
+        const textInput = document.getElementById('textInput');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+        const rawSentenceCountEl = document.getElementById('rawSentenceCount');
+        const readTimeEl = document.getElementById('readTime');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        const dropZone = document.getElementById('dropZone');
+        const fileUploadInput = document.getElementById('fileUploadInput');
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+
+        const modeLocalBtn = document.getElementById('modeLocalBtn');
+        const modeHybridBtn = document.getElementById('modeHybridBtn');
+        const targetGenreSelect = document.getElementById('targetGenreSelect');
+
+        const toggleAuthorDrawerBtn = document.getElementById('toggleAuthorDrawerBtn');
+        const authorSampleDrawer = document.getElementById('authorSampleDrawer');
+        const authorSampleInput = document.getElementById('authorSampleInput');
+
+        const emptyState = document.getElementById('emptyState');
+        const analysisContent = document.getElementById('analysisContent');
+        const gaugeCircle = document.getElementById('gaugeCircle');
+        const aiScorePercent = document.getElementById('aiScorePercent');
+        const verdictBadge = document.getElementById('verdictBadge');
+        const uncertaintyRange = document.getElementById('uncertaintyRange');
+        const confidenceLevelBadge = document.getElementById('confidenceLevelBadge');
+
+        const segmentationAuditBanner = document.getElementById('segmentationAuditBanner');
+        const auditDetailsText = document.getElementById('auditDetailsText');
+
+        // Contadores
+        const totalBlocksCount = document.getElementById('totalBlocksCount');
+        const bodySentencesCount = document.getElementById('bodySentencesCount');
+        const titlesCount = document.getElementById('titlesCount');
+        const referencesCount = document.getElementById('referencesCount');
+        const listsCount = document.getElementById('listsCount');
+        const tablesCount = document.getElementById('tablesCount');
+        const abbrevCount = document.getElementById('abbrevCount');
+
+        // Métricas
+        const burstinessVal = document.getElementById('burstinessVal');
+        const burstinessBar = document.getElementById('burstinessBar');
+        const burstinessDesc = document.getElementById('burstinessDesc');
+
+        const ttrVal = document.getElementById('ttrVal');
+        const entropyVal = document.getElementById('entropyVal');
+        const perplexityVal = document.getElementById('perplexityVal');
+        const perplexityBar = document.getElementById('perplexityBar');
+        const perplexityDesc = document.getElementById('perplexityDesc');
+
+        const buzzwordsVal = document.getElementById('buzzwordsVal');
+        const buzzwordTags = document.getElementById('buzzwordTags');
+
+        // Estadísticas Rítmicas
+        const rhythmicProfileSection = document.getElementById('rhythmicProfileSection');
+        const statMean = document.getElementById('statMean');
+        const statMedian = document.getElementById('statMedian');
+        const statStdDev = document.getElementById('statStdDev');
+        const statP25 = document.getElementById('statP25');
+        const statP75 = document.getElementById('statP75');
+        const statIQR = document.getElementById('statIQR');
+        const statMinMax = document.getElementById('statMinMax');
+        const statOutliers = document.getElementById('statOutliers');
+        const histogramContainer = document.getElementById('histogramContainer');
+
+        const consecutiveDeltaText = document.getElementById('consecutiveDeltaText');
+        const sentenceTypesDistribution = document.getElementById('sentenceTypesDistribution');
+        const sectionShiftText = document.getElementById('sectionShiftText');
+
+        // Explicabilidad e Inspector
+        const explainabilitySection = document.getElementById('explainabilitySection');
+        const explainabilityList = document.getElementById('explainabilityList');
+
+        const zeroGptSentenceSection = document.getElementById('zeroGptSentenceSection');
+        const zeroGptTextContainer = document.getElementById('zeroGptTextContainer');
+        const sentenceDetailCard = document.getElementById('sentenceDetailCard');
+        const detailSentenceTitle = document.getElementById('detailSentenceTitle');
+        const detailSentenceText = document.getElementById('detailSentenceText');
+        const detailSentenceTypeBadge = document.getElementById('detailSentenceTypeBadge');
+        const detailSentenceWords = document.getElementById('detailSentenceWords');
+
+        const authorComparisonSection = document.getElementById('authorComparisonSection');
+        const authorComparisonDetails = document.getElementById('authorComparisonDetails');
+
+        const llmJudgeSection = document.getElementById('llmJudgeSection');
+        const llmScoreBadge = document.getElementById('llmScoreBadge');
+        const llmPerplexityText = document.getElementById('llmPerplexityText');
+        const llmBurstinessText = document.getElementById('llmBurstinessText');
+        const llmObservationsList = document.getElementById('llmObservationsList');
+
+        const fullReportSection = document.getElementById('fullReportSection');
+        const fourteenPointsContainer = document.getElementById('fourteenPointsContainer');
+
+        let isHybridMode = false;
+
+        // SEGMENTACIÓN Y PROTECCIÓN
+        function preprocessAndProtectText(rawText) {
+            let text = rawText;
+            let foundAbbrevs = 0;
+
+            // Proteger URLs y DOIs
+            text = text.replace(/(https?:\/\/[^\s]+|10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/gi, (match) => match.replace(/\./g, '__DOT__'));
+
+            // Proteger iniciales (e.g. J. K. Smith)
+            text = text.replace(/\b([A-Z])\.\s(?=[A-Z]\.|\b[A-Z][a-z]+)/g, '$1__DOT__ ');
+
+            // Proteger abreviaturas
+            PROTECTED_ABBREVIATIONS.forEach(abbr => {
+                const escaped = abbr.replace(/\./g, '\\.');
+                const regex = new RegExp(`\\b${escaped}`, 'gi');
+                text = text.replace(regex, (match) => {
+                    foundAbbrevs++;
+                    return match.replace(/\./g, '__DOT__');
+                });
+            });
+
+            // Decimales
+            text = text.replace(/(\d+)\.(\d+)/g, '$1__DOT__$2');
+
+            return { protectedText: text, foundAbbrevs };
+        }
+
+        function restoreProtectedText(text) {
+            return text.replace(/__DOT__/g, '.');
+        }
+
+        function extractWords(text) {
+            const clean = restoreProtectedText(text)
+                .toLowerCase()
+                .replace(/[^\wáéíóúñü\s]/gi, ' ');
+            return clean.split(/\s+/).filter(w => w.length > 0);
+        }
+
+        function classifyTextBlocks(rawText) {
+            const { protectedText, foundAbbrevs } = preprocessAndProtectText(rawText);
+            const rawLines = protectedText.split(/\r?\n/);
+            
+            let blocks = [];
+            let inReferencesSection = false;
+
+            let counts = { titles: 0, references: 0, lists: 0, tables: 0, bodySentences: 0 };
+
+            rawLines.forEach(line => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                const restoredLine = restoreProtectedText(trimmed);
+                const words = extractWords(trimmed);
+                const wordLen = words.length;
+
+                if (/^(referencias|bibliografía|references|works cited|literature cited)/i.test(restoredLine)) {
+                    inReferencesSection = true;
+                    blocks.push({ text: restoredLine, type: 'title', wordsCount: wordLen });
+                    counts.titles++;
+                    return;
+                }
+
+                if (inReferencesSection) {
+                    blocks.push({ text: restoredLine, type: 'reference', wordsCount: wordLen });
+                    counts.references++;
+                    return;
+                }
+
+                if (/^\||---|table \d|figura \d|tabla \d/i.test(restoredLine) || (restoredLine.includes('\t') && wordLen < 15)) {
+                    blocks.push({ text: restoredLine, type: 'table', wordsCount: wordLen });
+                    counts.tables++;
+                    return;
+                }
+
+                if (/^([\*\-\•\>]|\d+[\.\)]|[a-z][\.\)])\s+/i.test(restoredLine)) {
+                    blocks.push({ text: restoredLine, type: 'list', wordsCount: wordLen });
+                    counts.lists++;
+                    return;
+                }
+
+                if (wordLen <= 8 && !/[.!?]$/.test(trimmed) && !/,/.test(trimmed)) {
+                    blocks.push({ text: restoredLine, type: 'title', wordsCount: wordLen });
+                    counts.titles++;
+                    return;
+                }
+
+                const sentenceMatches = trimmed.split(/(?<=[.!?])\s+/);
+
+                sentenceMatches.forEach(sent => {
+                    const cleanSent = restoreProtectedText(sent.trim());
+                    if (!cleanSent) return;
+
+                    const wCount = extractWords(cleanSent).length;
+                    
+                    if (/^\[\d+\]|^doi:/i.test(cleanSent) || (wCount <= 5 && /\(\d{4}\)/.test(cleanSent))) {
+                        blocks.push({ text: cleanSent, type: 'reference', wordsCount: wCount });
+                        counts.references++;
+                    } else if (wCount > 0) {
+                        blocks.push({ text: cleanSent, type: 'body', wordsCount: wCount });
+                        counts.bodySentences++;
+                    }
+                });
+            });
+
+            return { blocks, counts, foundAbbrevs };
+        }
+
+        // CÁLCULO ESTADÍSTICO DE RÍTMICA
+        function calculateRhythmicStatistics(lengths) {
+            if (!lengths || lengths.length === 0) {
+                return {
+                    mean: 0, median: 0, stdDev: 0, min: 0, max: 0,
+                    p25: 0, p75: 0, iqr: 0, outliersCount: 0,
+                    consecutiveDelta: 0, cv: 0, lengths
+                };
+            }
+
+            const sorted = [...lengths].sort((a, b) => a - b);
+            const n = sorted.length;
+            const sum = lengths.reduce((acc, v) => acc + v, 0);
+            const mean = sum / n;
+
+            const median = n % 2 === 0 
+                ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2 
+                : sorted[Math.floor(n / 2)];
+
+            function getPercentile(arr, p) {
+                const idx = (arr.length - 1) * p;
+                const lower = Math.floor(idx);
+                const upper = Math.ceil(idx);
+                const weight = idx - lower;
+                if (upper >= arr.length) return arr[arr.length - 1];
+                return arr[lower] * (1 - weight) + arr[upper] * weight;
+            }
+
+            const p25 = Math.round(getPercentile(sorted, 0.25));
+            const p75 = Math.round(getPercentile(sorted, 0.75));
+            const iqr = p75 - p25;
+
+            const variance = lengths.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance);
+            const cv = mean > 0 ? stdDev / mean : 0;
+
+            const lowerBound = p25 - 1.5 * iqr;
+            const upperBound = p75 + 1.5 * iqr;
+            const outliers = sorted.filter(v => v < lowerBound || v > upperBound);
+
+            let totalDelta = 0;
+            for (let i = 0; i < lengths.length - 1; i++) {
+                totalDelta += Math.abs(lengths[i + 1] - lengths[i]);
+            }
+            const consecutiveDelta = lengths.length > 1 ? totalDelta / (lengths.length - 1) : 0;
+
+            return {
+                mean: parseFloat(mean.toFixed(1)),
+                median: parseFloat(median.toFixed(1)),
+                stdDev: parseFloat(stdDev.toFixed(1)),
+                min: sorted[0],
+                max: sorted[n - 1],
+                p25,
+                p75,
+                iqr,
+                outliersCount: outliers.length,
+                consecutiveDelta: parseFloat(consecutiveDelta.toFixed(1)),
+                cv: parseFloat(cv.toFixed(2)),
+                lengths
+            };
+        }
+
+        // METRICAS LÉXICAS Y DISCURSIVAS
+        function calculateLexicalAndCohesionMetrics(bodyWords, rawText) {
+            if (bodyWords.length === 0) return { ttr: 0, entropy: 0, foundBuzzwords: [], isAcademicTerms: false };
+
+            const uniqueSet = new Set(bodyWords);
+            const ttr = parseFloat((uniqueSet.size / bodyWords.length).toFixed(2));
+
+            const freqMap = {};
+            bodyWords.forEach(w => freqMap[w] = (freqMap[w] || 0) + 1);
+
+            let entropy = 0;
+            const len = bodyWords.length;
+            for (const k in freqMap) {
+                const p = freqMap[k] / len;
+                entropy -= p * Math.log2(p);
+            }
+
+            const foundBuzzwords = [];
+            AI_BUZZWORD_PATTERNS.forEach(pat => {
+                const match = rawText.match(pat);
+                if (match && !foundBuzzwords.includes(match[0].toLowerCase())) {
+                    foundBuzzwords.push(match[0].toLowerCase());
+                }
+            });
+
+            const humanAcademicSignals = ['nuestro experimento', 'observamos en el laboratorio', 'en la tabla 1', 'en la figura', 'en el gráfico', 'revisamos los datos', 'entrevistamos', 'se midió mediante'];
+            const lowerText = rawText.toLowerCase();
+            const foundHumanSignals = humanAcademicSignals.filter(t => lowerText.includes(t));
+
+            return {
+                ttr,
+                entropy: parseFloat(entropy.toFixed(1)),
+                foundBuzzwords,
+                hasHumanSignals: foundHumanSignals.length >= 1
+            };
+        }
+
+        // ==================================================================
+        // ALGORITMO RECALIBRADO DE ESTIMACIÓN DE PROBABILIDAD DE IA
+        // ==================================================================
+        function computeMultidimensionalAiScore(stats, lexical, genre, counts) {
+            let score = 0;
+
+            // 1. RÁFAGA (CV) - SÍNTOMA CLAVE DE IA:
+            // Los LLMs tienden a generar oraciones de longitud muy uniforme (CV entre 0.15 y 0.40)
+            if (stats.cv < 0.28) {
+                score += 45; // Uniformidad extrema de LLM
+            } else if (stats.cv < 0.42) {
+                score += 32; // Alta uniformidad típica
+            } else if (stats.cv < 0.55) {
+                score += 15;
+            } else if (stats.cv > 0.70) {
+                score -= 15; // Variación orgánica alta (Humana)
+            }
+
+            // 2. DESVIACIÓN ESTÁNDAR DE LONGITUD DE ORACIÓN:
+            if (stats.stdDev < 6.0 && stats.lengths.length >= 3) {
+                score += 18;
+            }
+
+            // 3. MARCACIÓN DISCURSIVA / MULETILLAS CLICHÉ DE IA:
+            // Cada patrón hallado aporta peso fuerte acumulativo
+            const buzzwordsCount = lexical.foundBuzzwords.length;
+            score += Math.min(48, buzzwordsCount * 14);
+
+            // 4. SIMETRÍA Y REPETICIÓN DE ESTRUCTURA ORACIONAL:
+            if (Math.abs(stats.mean - stats.median) <= 2.0 && stats.lengths.length >= 3) {
+                score += 12;
+            }
+
+            // 5. PERPLEJIDAD LÉXICA Y DIVERSIDAD (TTR / ENTROPÍA):
+            if (lexical.ttr < 0.72 && stats.lengths.length >= 3) {
+                score += 12;
+            }
+
+            // 6. MITIGACIÓN DE FALSOS POSITIVOS (SÓLO CON PRUEBAS REALES HUMANA)
+            let mitigations = [];
+
+            if (lexical.hasHumanSignals) {
+                score -= 20;
+                mitigations.push("Presencia de señales de primera persona o referencias experimentales de campo.");
+            }
+
+            if (stats.outliersCount >= 2) {
+                score -= 12;
+                mitigations.push(`Identificadas ${stats.outliersCount} oraciones con extensiones atípicas (estilo humano).`);
+            }
+
+            if (stats.consecutiveDelta > 15) {
+                score -= 15;
+                mitigations.push("Alta alternancia entre oraciones consecutivas cortas y muy largas.");
+            }
+
+            // Normalización final 5% - 98%
+            score = Math.max(5, Math.min(98, Math.round(score)));
+
+            // Clasificación y rangos de confianza
+            let category = "Escrito por Humano";
+            let confidence = "Alta";
+            let margin = 7;
+
+            if (score >= 68) {
+                category = "100% / Probablemente Generado por IA";
+                confidence = "Alta";
+                margin = 5;
+            } else if (score >= 40) {
+                category = "Texto Híbrido / Asistido por IA";
+                confidence = "Media";
+                margin = 12;
+            } else if (stats.lengths.length < 2) {
+                category = "Inconcluso (Muestra Muy Corta)";
+                confidence = "Baja";
+                margin = 20;
+            }
+
+            const minRange = Math.max(0, score - margin);
+            const maxRange = Math.min(100, score + margin);
+
+            return {
+                finalScore: score,
+                category,
+                confidence,
+                rangeText: `${minRange}% - ${maxRange}%`,
+                mitigations
+            };
+        }
+
+        function updateCounters() {
+            const rawText = textInput.value;
+            const words = extractWords(rawText);
+            const rawSentences = rawText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+
+            wordCountEl.textContent = words.length;
+            charCountEl.textContent = rawText.length;
+            rawSentenceCountEl.textContent = rawSentences.length;
+
+            const minutes = Math.ceil(words.length / 200);
+            readTimeEl.textContent = `Tiempo est. lectura ~ ${words.length === 0 ? 0 : minutes} min`;
+
+            analyzeBtn.disabled = words.length < 8;
+        }
+
+        function renderAuditBannerAndParatexts(counts, foundAbbrevs, bodyLengths) {
+            totalBlocksCount.textContent = counts.titles + counts.references + counts.lists + counts.tables + counts.bodySentences;
+            bodySentencesCount.textContent = `${counts.bodySentences} oraciones`;
+            titlesCount.textContent = counts.titles;
+            referencesCount.textContent = counts.references;
+            listsCount.textContent = counts.lists;
+            tablesCount.textContent = counts.tables;
+            abbrevCount.textContent = `${foundAbbrevs}`;
+
+            auditDetailsText.textContent = `✓ Segmentación completa: Se procesaron ${counts.bodySentences} oraciones en el cuerpo principal y se aislaron elementos no-oracionales.`;
+        }
+
+        function renderRhythmicProfile(stats) {
+            statMean.textContent = stats.mean;
+            statMedian.textContent = stats.median;
+            statStdDev.textContent = stats.stdDev;
+            statP25.textContent = stats.p25;
+            statP75.textContent = stats.p75;
+            statIQR.textContent = stats.iqr;
+            statMinMax.textContent = `${stats.min} / ${stats.max}`;
+            statOutliers.textContent = stats.outliersCount;
+
+            histogramContainer.innerHTML = '';
+            if (stats.lengths.length === 0) return;
+
+            const maxLen = Math.max(...stats.lengths, 1);
+
+            stats.lengths.forEach((len, idx) => {
+                const heightPercent = Math.max(12, Math.round((len / maxLen) * 100));
+
+                const barWrapper = document.createElement('div');
+                barWrapper.className = 'flex-1 flex flex-col items-center gap-1 group min-w-[14px]';
+
+                const bar = document.createElement('div');
+                bar.style.height = `${heightPercent}%`;
+                
+                const isOutlier = len > (stats.p75 + 1.5 * stats.iqr) || len < (stats.p25 - 1.5 * stats.iqr);
+                bar.className = `w-full rounded-t transition-all cursor-pointer relative ${
+                    isOutlier ? 'bg-amber-500' : 'bg-blue-600 dark:bg-blue-500 group-hover:bg-indigo-600'
+                }`;
+                bar.title = `Oración #${idx + 1}: ${len} palabras`;
+
+                const label = document.createElement('span');
+                label.className = 'text-[9px] text-slate-400 font-mono';
+                label.textContent = len;
+
+                barWrapper.appendChild(bar);
+                barWrapper.appendChild(label);
+                histogramContainer.appendChild(barWrapper);
+            });
+
+            consecutiveDeltaText.textContent = `Variación entre oraciones consecutivas: ${stats.consecutiveDelta} palabras.`;
+
+            const shortS = stats.lengths.filter(l => l < 12).length;
+            const medS = stats.lengths.filter(l => l >= 12 && l <= 25).length;
+            const longS = stats.lengths.filter(l => l > 25).length;
+
+            sentenceTypesDistribution.innerHTML = `
+                <div>Cortas (&lt;12 pal.): <strong class="text-slate-800 dark:text-slate-200">${shortS}</strong></div>
+                <div>Medias (12-25 pal.): <strong class="text-slate-800 dark:text-slate-200">${medS}</strong></div>
+                <div>Largas (&gt;25 pal.): <strong class="text-slate-800 dark:text-slate-200">${longS}</strong></div>
+            `;
+        }
+
+        function renderSentenceInspector(blocks, finalScore) {
+            zeroGptTextContainer.innerHTML = '';
+            sentenceDetailCard.classList.add('hidden');
+
+            blocks.forEach((blk, idx) => {
+                const span = document.createElement('span');
+                span.className = 'inline-block mr-1.5 my-0.5 px-1.5 py-0.5 rounded cursor-pointer transition-all hover:scale-[1.01] ';
+
+                if (blk.type !== 'body') {
+                    span.classList.add('highlight-excluded');
+                    span.title = `Paratexto Excluido (${blk.type.toUpperCase()})`;
+                } else if (finalScore >= 68) {
+                    span.classList.add('highlight-ai');
+                } else if (finalScore >= 40) {
+                    span.classList.add('highlight-hybrid');
+                } else {
+                    span.classList.add('highlight-human');
+                }
+
+                span.textContent = blk.text + ' ';
+
+                span.addEventListener('click', () => {
+                    sentenceDetailCard.classList.remove('hidden');
+                    detailSentenceTitle.textContent = `Bloque #${idx + 1} (${blk.type.toUpperCase()})`;
+                    detailSentenceText.textContent = `"${blk.text}"`;
+                    detailSentenceWords.textContent = `${blk.wordsCount} palabras`;
+
+                    if (blk.type !== 'body') {
+                        detailSentenceTypeBadge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200';
+                        detailSentenceTypeBadge.textContent = `Excluido (${blk.type})`;
+                    } else if (finalScore >= 68) {
+                        detailSentenceTypeBadge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300';
+                        detailSentenceTypeBadge.textContent = 'Patrón de IA';
+                    } else if (finalScore >= 40) {
+                        detailSentenceTypeBadge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+                        detailSentenceTypeBadge.textContent = 'Híbrido / Asistido';
+                    } else {
+                        detailSentenceTypeBadge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300';
+                        detailSentenceTypeBadge.textContent = 'Humano Orgánico';
+                    }
+                });
+
+                zeroGptTextContainer.appendChild(span);
+            });
+        }
+
+        function renderExplainabilityPanel(aiEval, stats, lexical) {
+            explainabilityList.innerHTML = '';
+
+            const items = [
+                {
+                    title: "1. Ráfaga Sintáctica y Coeficiente de Variación (CV)",
+                    desc: `CV registrado = ${stats.cv}. ${
+                        stats.cv < 0.40 
+                            ? "Alta simetría en la longitud de oraciones, característico de generación sintética." 
+                            : "Buena variación rítmica entre oraciones."
+                    }`,
+                    badge: stats.cv < 0.40 ? "Patrón IA" : "Variabilidad Humana"
+                },
+                {
+                    title: "2. Conectores Discursivos y Marcadores Frecuentes",
+                    desc: lexical.foundBuzzwords.length > 0 
+                        ? `Detectados ${lexical.foundBuzzwords.length} conectores habituales en respuestas de LLMs: "${lexical.foundBuzzwords.join('", "')}".`
+                        : "Sin acumulación de conectores cliché.",
+                    badge: lexical.foundBuzzwords.length > 0 ? "Marcador IA" : "Limpio"
+                },
+                {
+                    title: "3. Simetría Oracional y Desviación",
+                    desc: `Desviación estándar = ${stats.stdDev}. Media = ${stats.mean} palabras.`,
+                    badge: stats.stdDev < 6.0 ? "Alta Uniformidad" : "Variación Normal"
+                }
+            ];
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2";
+                div.innerHTML = `
+                    <div>
+                        <strong class="font-bold text-slate-800 dark:text-slate-200 block text-xs">${item.title}</strong>
+                        <p class="text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed text-[11px]">${item.desc}</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 shrink-0">${item.badge}</span>
+                `;
+                explainabilityList.appendChild(div);
+            });
+        }
+
+        function renderAuthorComparison(bodyWords, stats) {
+            const authorText = authorSampleInput.value.trim();
+            if (!authorText) {
+                authorComparisonSection.classList.add('hidden');
+                return;
+            }
+
+            authorComparisonSection.classList.remove('hidden');
+            const authorWords = extractWords(authorText);
+            const { blocks } = classifyTextBlocks(authorText);
+            const authorLengths = blocks.filter(b => b.type === 'body').map(b => b.wordsCount);
+            const authorStats = calculateRhythmicStatistics(authorLengths);
+
+            const meanDiff = Math.abs(stats.mean - authorStats.mean);
+            const cvDiff = Math.abs(stats.cv - authorStats.cv);
+
+            authorComparisonDetails.innerHTML = `
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span class="font-bold text-slate-700 dark:text-slate-300 block">Línea Base del Autor</span>
+                    <div>Media de palabras/oración: <strong>${authorStats.mean}</strong></div>
+                    <div>Coeficiente de Ráfaga (CV): <strong>${authorStats.cv}</strong></div>
+                    <div>Palabras en muestra: <strong>${authorWords.length}</strong></div>
+                </div>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1">
+                    <span class="font-bold text-slate-700 dark:text-slate-300 block">Comparación vs. Texto Evaluado</span>
+                    <div>Diferencia en longitud media: <strong class="${meanDiff > 8 ? 'text-amber-600' : 'text-emerald-600'}">${meanDiff.toFixed(1)} palabras</strong></div>
+                    <div>Diferencia en Ráfaga ($\Delta CV$): <strong class="${cvDiff > 0.25 ? 'text-amber-600' : 'text-emerald-600'}">${cvDiff.toFixed(2)}</strong></div>
+                </div>
+            `;
+        }
+
+        function render14PointReport(counts, stats, lexical, aiEval) {
+            const reportText = `INFORME ESTILOMÉTRICO FORENSE - VERITASAI 4.1
+=====================================================
+1. Oraciones en Cuerpo Principal: ${counts.bodySentences}
+2. Bloques Paratextuales Isolados: ${counts.titles + counts.references + counts.lists + counts.tables}
+3. Promedio de Palabras por Oración (Media): ${stats.mean}
+4. Mediana (p50): ${stats.median}
+5. Desviación Estándar (σ): ${stats.stdDev}
+6. Percentiles Rítmicos: p25 = ${stats.p25} | p75 = ${stats.p75} | IQR = ${stats.iqr}
+7. Extensión Mín / Máx: ${stats.min} / ${stats.max} palabras
+8. Variación Sintáctica (CV Rítmico): ${stats.cv}
+9. Diversidad Léxica (TTR): ${lexical.ttr}
+10. Conectores Cliché de IA Detectados: ${lexical.foundBuzzwords.length} (${lexical.foundBuzzwords.join(', ') || 'Ninguno'})
+11. Nivel de Confianza: ${aiEval.confidence} (Intervalo estimado: ${aiEval.rangeText})
+12. Dictamen Final: ${aiEval.category} (${aiEval.finalScore}% Probabilidad de IA)`;
+
+            fourteenPointsContainer.textContent = reportText;
+        }
+
+        // EJECUCIÓN PRINCIPAL DE ANÁLISIS
+        analyzeBtn.addEventListener('click', async () => {
+            const rawText = textInput.value.trim();
+            if (!rawText) return;
+
+            analyzeBtn.disabled = true;
+            btnSpinner.classList.remove('hidden');
+            btnText.textContent = 'Analizando Estructura y Parámetros...';
+
+            const { blocks, counts, foundAbbrevs } = classifyTextBlocks(rawText);
+
+            const bodyBlocks = blocks.filter(b => b.type === 'body');
+            const bodyLengths = bodyBlocks.map(b => b.wordsCount);
+            const bodyWords = extractWords(bodyBlocks.map(b => b.text).join(' '));
+
+            const stats = calculateRhythmicStatistics(bodyLengths);
+            const lexical = calculateLexicalAndCohesionMetrics(bodyWords, rawText);
+
+            const genre = targetGenreSelect.value;
+            const aiEval = computeMultidimensionalAiScore(stats, lexical, genre, counts);
+
+            emptyState.classList.add('hidden');
+            analysisContent.classList.remove('hidden');
+            rhythmicProfileSection.classList.remove('hidden');
+            explainabilitySection.classList.remove('hidden');
+            zeroGptSentenceSection.classList.remove('hidden');
+            fullReportSection.classList.remove('hidden');
+
+            aiScorePercent.textContent = `${aiEval.finalScore}%`;
+            const offset = 251.2 - (251.2 * aiEval.finalScore / 100);
+            gaugeCircle.style.strokeDashoffset = offset;
+
+            let gaugeColor = 'text-emerald-500';
+            let badgeStyle = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+
+            if (aiEval.finalScore >= 68) {
+                gaugeColor = 'text-red-500';
+                badgeStyle = 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300';
+            } else if (aiEval.finalScore >= 40) {
+                gaugeColor = 'text-amber-500';
+                badgeStyle = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+            }
+
+            gaugeCircle.setAttribute('class', `gauge-cover ${gaugeColor}`);
+            verdictBadge.className = `mt-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${badgeStyle}`;
+            verdictBadge.textContent = aiEval.category;
+
+            uncertaintyRange.textContent = aiEval.rangeText;
+            confidenceLevelBadge.textContent = `Confianza: ${aiEval.confidence}`;
+
+            burstinessVal.textContent = stats.cv;
+            burstinessBar.style.width = `${Math.min(100, Math.round(stats.cv * 100))}%`;
+
+            ttrVal.textContent = lexical.ttr;
+            entropyVal.textContent = lexical.entropy;
+            perplexityVal.textContent = `${Math.round((1 - lexical.ttr) * 100)}/100`;
+            perplexityBar.style.width = `${Math.round((1 - lexical.ttr) * 100)}%`;
+
+            buzzwordsVal.textContent = `${lexical.foundBuzzwords.length} detectados`;
+            buzzwordTags.innerHTML = '';
+            if (lexical.foundBuzzwords.length === 0) {
+                buzzwordTags.innerHTML = `<span class="text-[10px] text-slate-400 italic">Sin muletillas típicas</span>`;
+            } else {
+                lexical.foundBuzzwords.forEach(bw => {
+                    const tag = document.createElement('span');
+                    tag.className = 'text-[10px] px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-medium border border-indigo-100 dark:border-indigo-800/50';
+                    tag.textContent = bw;
+                    buzzwordTags.appendChild(tag);
+                });
+            }
+
+            renderAuditBannerAndParatexts(counts, foundAbbrevs, bodyLengths);
+            renderRhythmicProfile(stats);
+            renderExplainabilityPanel(aiEval, stats, lexical);
+            renderSentenceInspector(blocks, aiEval.finalScore);
+            renderAuthorComparison(bodyWords, stats);
+            render14PointReport(counts, stats, lexical, aiEval);
+
+            if (isHybridMode) {
+                try {
+                    llmJudgeSection.classList.remove('hidden');
+                    llmScoreBadge.textContent = "Consultando Gemini 3 Flash...";
+                    
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                    const prompt = `Analiza cualitativamente si este texto fue escrito por un LLM o un humano. Responde en JSON:
+{
+  "llmAiScore": (0-100),
+  "perplexityAnalysis": "Explicación breve",
+  "burstinessAnalysis": "Explicación breve",
+  "keyObservations": ["obs 1", "obs 2"]
+}
+Texto: """${rawText.slice(0, 3000)}"""`;
+
+                    const res = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseMimeType: "application/json" }
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const parsed = JSON.parse(data.candidates[0].content.parts[0].text);
+                        llmScoreBadge.textContent = `${parsed.llmAiScore}% Probabilidad Gemini`;
+                        llmPerplexityText.textContent = parsed.perplexityAnalysis;
+                        llmBurstinessText.textContent = parsed.burstinessAnalysis;
+                        llmObservationsList.innerHTML = '';
+                        (parsed.keyObservations || []).forEach(o => {
+                            const li = document.createElement('li');
+                            li.textContent = o;
+                            llmObservationsList.appendChild(li);
+                        });
+                    }
+                } catch (e) {
+                    llmJudgeSection.classList.add('hidden');
+                }
+            } else {
+                llmJudgeSection.classList.add('hidden');
+            }
+
+            analyzeBtn.disabled = false;
+            btnSpinner.classList.add('hidden');
+            btnText.textContent = 'Ejecutar Análisis Forense de IA';
+        });
+
+        // Eventos UI
+        toggleAuthorDrawerBtn.addEventListener('click', () => authorSampleDrawer.classList.toggle('hidden'));
+
+        document.getElementById('presetAiBtn').addEventListener('click', () => {
+            textInput.value = PRESETS.ai;
+            targetGenreSelect.value = 'general';
+            updateCounters();
+        });
+        document.getElementById('presetAcademicHumanBtn').addEventListener('click', () => {
+            textInput.value = PRESETS.academicHuman;
+            targetGenreSelect.value = 'academic';
+            updateCounters();
+        });
+        document.getElementById('presetEditedBtn').addEventListener('click', () => {
+            textInput.value = PRESETS.edited;
+            targetGenreSelect.value = 'general';
+            updateCounters();
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            textInput.value = '';
+            updateCounters();
+            emptyState.classList.remove('hidden');
+            analysisContent.classList.add('hidden');
+            rhythmicProfileSection.classList.add('hidden');
+            explainabilitySection.classList.add('hidden');
+            zeroGptSentenceSection.classList.add('hidden');
+            authorComparisonSection.classList.add('hidden');
+            llmJudgeSection.classList.add('hidden');
+            fullReportSection.classList.add('hidden');
+        });
+
+        textInput.addEventListener('input', updateCounters);
+
+        uploadFileBtn.addEventListener('click', () => fileUploadInput.click());
+        fileUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    textInput.value = evt.target.result;
+                    updateCounters();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        modeLocalBtn.addEventListener('click', () => {
+            isHybridMode = false;
+            modeLocalBtn.className = "px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm transition-all flex items-center gap-1.5";
+            modeHybridBtn.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center gap-1.5";
+        });
+
+        modeHybridBtn.addEventListener('click', () => {
+            isHybridMode = true;
+            modeHybridBtn.className = "px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm transition-all flex items-center gap-1.5";
+            modeLocalBtn.className = "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center gap-1.5";
+        });
+
+        document.getElementById('downloadReportTextBtn').addEventListener('click', () => {
+            const report = fourteenPointsContainer.textContent;
+            navigator.clipboard.writeText(report).then(() => {
+                const btn = document.getElementById('downloadReportTextBtn');
+                btn.textContent = '¡Copiado al Portapapeles!';
+                setTimeout(() => btn.textContent = 'Copiar Informe Completo', 2000);
+            });
+        });
+
+        document.getElementById('copyReportBtn').addEventListener('click', () => {
+            const report = `[VERITASAI 4.1]
+Probabilidad de IA: ${aiScorePercent.textContent} (${verdictBadge.textContent})
+Rango Estimado: ${uncertaintyRange.textContent}
+Media Palabras/Oración: ${statMean.textContent}
+Ráfaga (CV): ${burstinessVal.textContent}`;
+
+            navigator.clipboard.writeText(report).then(() => {
+                const toast = document.getElementById('copyToast');
+                toast.classList.remove('opacity-0');
+                setTimeout(() => toast.classList.add('opacity-0'), 2000);
+            });
+        });
+
+        // Tema Claro/Oscuro
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            sunIcon.classList.toggle('hidden', !isDark);
+            moonIcon.classList.toggle('hidden', isDark);
+        });
+    </script>
+</body>
+</html>
